@@ -21,7 +21,17 @@ class ViewController: UIViewController {
     }
 
     @IBAction func sigInClicked(_ sender: Any) {
-        performSegue(withIdentifier: "toFeedVC", sender: nil)
+        if emailTextField.text != "" && passwordTextField.text != ""{
+            Auth.auth().signIn(withEmail: emailTextField.text!, password: passwordTextField.text!) { result, error in
+                if error != nil{
+                    self.showErrorMessage(titleInput: "Error", messageInput: error?.localizedDescription ?? "Please try again")
+                }else{
+                    self.performSegue(withIdentifier: "toFeedVC", sender: nil)
+                }
+            }
+        }else{
+            self.showErrorMessage(titleInput: "Error", messageInput: "Please enter username and password")
+        }
     }
     
     @IBAction func registerClicked(_ sender: Any) {
