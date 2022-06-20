@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseStorage
+
 
 class UploadViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -13,7 +16,7 @@ class UploadViewController: UIViewController, UIImagePickerControllerDelegate, U
     @IBOutlet weak var imageView: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         imageView.isUserInteractionEnabled = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(pickPicture))
         imageView.addGestureRecognizer(gestureRecognizer)
@@ -33,7 +36,36 @@ class UploadViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     @IBAction func uploadButtonClicked(_ sender: Any) {
+        let storage = Storage.storage()
+        let storageReference = storage.reference()
         
+        let mediaFolder = storageReference.child("media")
+        
+        if let data = imageView.image?.jpegData(compressionQuality: 0.5) {
+            
+            let uuid = UUID().uuidString
+            
+            
+            let imageReference = mediaFolder.child("\(uuid).jpg")
+            imageReference.putData(data, metadata: nil) { metadata, error in
+                if error != nil{
+                    showErrorMessage(title: "Error", message: error?.localizedDescription ?? "Please try again.")
+                }else{
+                    imageReference.downloadURL { url, error in
+                        if error == nil {
+                            let imageUrl = url?.absoluteString
+                            print(imageUrl)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    func showErrorMessage(title:String, message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        let okButton = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        alert.addAction(okButton)
+        self.present(alert, animated: true, completion: nil)
     }
     
 }
