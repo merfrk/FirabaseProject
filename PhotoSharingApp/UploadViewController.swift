@@ -49,12 +49,24 @@ class UploadViewController: UIViewController, UIImagePickerControllerDelegate, U
             let imageReference = mediaFolder.child("\(uuid).jpg")
             imageReference.putData(data, metadata: nil) { metadata, error in
                 if error != nil{
-                    showErrorMessage(title: "Error", message: error?.localizedDescription ?? "Please try again.")
+                    self.showErrorMessage(title: "Error", message: error?.localizedDescription ?? "Please try again.")
                 }else{
                     imageReference.downloadURL { url, error in
                         if error == nil {
                             let imageUrl = url?.absoluteString
-                            print(imageUrl)
+                            
+                           
+                            if let imageUrl = imageUrl {
+                                let firestoreDatabase = Firestore.firestore()
+                                let firestorePost = ["imageurl" : imageUrl, "comment" : self.commentTextField.text, "email" : Auth.auth().currentUser!.email, "date" : FieldValue.serverTimestamp()] as [String : Any]
+                                firestoreDatabase.collection("Post").addDocument(data: firestorePost) { error in
+                                    if error != nil{
+                                        self.showErrorMessage(title: "Error", message: error?.localizedDescription ?? "Please try again.")
+                                    }else{
+                                        
+                                    }
+                                }
+                            }
                         }
                     }
                 }
