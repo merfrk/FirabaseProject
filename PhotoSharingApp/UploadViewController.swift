@@ -63,7 +63,9 @@ class UploadViewController: UIViewController, UIImagePickerControllerDelegate, U
                                     if error != nil{
                                         self.showErrorMessage(title: "Error", message: error?.localizedDescription ?? "Please try again.")
                                     }else{
-                                        
+                                        self.imageView.image = UIImage(named: "gorselsec")
+                                        self.commentTextField.text = ""
+                                        self.tabBarController?.selectedIndex = 0
                                     }
                                 }
                             }
